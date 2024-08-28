@@ -1,0 +1,70 @@
+generator client {
+    provider = "prisma-client-js"
+}
+
+datasource db {
+    provider = "postgresql"
+    url      = env("DATABASE_URL")
+}
+
+model User {
+    id Int @id @default(autoincrement())
+
+    email      String  @unique
+    password   String
+    name       String?
+    avatarPath String  @default("") @map("avatar_path")
+    phone      String  @default("")
+    country    String?
+
+    rights Role[] @default([USER])
+
+    verificationToken String? @default(cuid()) @map("verification_token")
+
+    createdAt DateTime @default(now()) @map("created_at")
+    updatedAt DateTime @updatedAt @map("updated_at")
+}
+
+enum Role {
+    USER
+    PREMIUM
+    MANAGER
+    ADMIN
+}
+
+model Sneaker {
+    id          Int      @id @default(autoincrement())
+    name        String
+    description String?
+    brand       String
+    gender      Gender
+    price       Float
+    sizes       Size[]   @relation("SneakerSizes")
+    images      Image[]  @relation("SneakerImages")
+    image       String   @default("")
+    discount    Float?   @default(0)
+    rating      Float?   @default(0)
+    color       String
+    stock       Int      @default(0)
+    createdAt   DateTime @default(now()) @map("created_at")
+    updatedAt   DateTime @updatedAt @map("updated_at")
+}
+
+enum Gender {
+    MALE
+    FEMALE
+    UNISEX
+}
+
+model Size {
+    id       Int       @id @default(autoincrement())
+    size     Float
+    sneakers Sneaker[] @relation("SneakerSizes")
+}
+
+model Image {
+    id        Int     @id @default(autoincrement())
+    url       String
+    sneaker   Sneaker @relation("SneakerImages", fields: [sneakerId], references: [id])
+    sneakerId Int
+}
