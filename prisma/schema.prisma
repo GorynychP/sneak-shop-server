@@ -14,8 +14,8 @@ model User {
     password   String
     name       String?
     avatarPath String  @default("") @map("avatar_path")
-    phone      String  @default("")
-    country    String?
+    phone      String? @default("")
+    country    String? @default("")
 
     rights Role[] @default([USER])
 
