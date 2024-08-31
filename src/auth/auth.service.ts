@@ -80,7 +80,7 @@ export class AuthService {
         return { user: this.omitPassword(user), ...tokens };
     }
 
-    private async issueTokens(userId: number, rights: Role[]) {
+    private async issueTokens(userId: string, rights: Role[]) {
         const payload = { id: userId, rights };
         const accessToken = this.jwt.sign(payload, {
             expiresIn: this.TOKEN_EXPIRATION_ACCESS,

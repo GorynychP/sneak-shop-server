@@ -43,9 +43,13 @@ export class UserService {
         return { items: users, isHasMore };
     }
 
-    async findById(id: number) {
+    async findById(id: string) {
         const user = await this.prisma.user.findUnique({
             where: { id },
+            include: {
+                favorites: true,
+                orders: true,
+            },
         });
         if (!user) throw new NotFoundException('User not found');
         return user;
@@ -53,12 +57,16 @@ export class UserService {
     async findByEmail(email: string) {
         const user = await this.prisma.user.findUnique({
             where: { email },
+            include: {
+                favorites: true,
+                orders: true,
+            },
         });
         // if (!user) throw new NotFoundException('User not found');
         return user;
     }
 
-    async update(id: number, { password, rights, ...data }: UpdateUserDto) {
+    async update(id: string, { password, rights, ...data }: UpdateUserDto) {
         const currentUser = await this.findById(id);
         if (rights && !currentUser.rights.includes('ADMIN')) {
             throw new ForbiddenException('You do not have permission to change rights.');
@@ -80,12 +88,12 @@ export class UserService {
         });
     }
 
-    async remove(id: number) {
+    async remove(id: string) {
         if (!id) throw new NotFoundException('id is required');
-        await this.findById(+id);
+        await this.findById(id);
         return this.prisma.user.delete({
             where: {
-                id: +id,
+                id: id,
             },
         });
     }

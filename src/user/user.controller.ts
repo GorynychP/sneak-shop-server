@@ -17,7 +17,7 @@ export class UserController {
 
     @Auth()
     @Get('profile')
-    async getProfile(@CurrentUser('id') id: number) {
+    async getProfile(@CurrentUser('id') id: string) {
         return this.userService.findById(id);
     }
 
@@ -29,13 +29,13 @@ export class UserController {
     @Auth()
     @Patch()
     update(@CurrentUser('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-        return this.userService.update(+id, updateUserDto);
+        return this.userService.update(id, updateUserDto);
     }
 
     @Auth(Role.ADMIN)
     @Delete(':id')
     async remove(@Param('id') id: string) {
-        await this.userService.remove(+id);
+        await this.userService.remove(id);
         return 'Юзер удален';
     }
 

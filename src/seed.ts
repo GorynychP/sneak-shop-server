@@ -17,7 +17,7 @@ const prisma = new PrismaClient();
 const countries = ['Russia', 'Ukraine', 'China', 'Belarus', 'Kazakhstan', 'Turkey '];
 
 async function main() {
-    const NUM_USERS = 25;
+    const NUM_USERS = 20;
 
     for (let i = 0; i < NUM_USERS; i++) {
         const email = faker.internet.email();
@@ -46,14 +46,14 @@ async function main() {
     for (let i = 0; i < NUM_USERS; i++) {
         const createdAt = faker.date.past({ years: 1 });
 
-        await prisma.sneaker.create({
+        await prisma.product.create({
             data: {
                 description: faker.commerce.productDescription(),
                 rating: +faker.helpers.arrayElement([0, 1, 2, 3, 4, 5]),
                 discount: +faker.helpers.arrayElement([5, 10, 15, 20, 25, 50]),
                 color: faker.color.human(),
                 stock: +faker.helpers.arrayElement([1, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50]),
-                image: faker.image.urlPicsumPhotos(),
+                images: [faker.image.urlPicsumPhotos()],
                 gender: 'MALE',
                 name: faker.commerce.productName(),
                 price: +faker.commerce.price({ min: 800, max: 10000 }),

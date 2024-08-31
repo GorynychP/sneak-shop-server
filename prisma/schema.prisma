@@ -8,14 +8,17 @@ datasource db {
 }
 
 model User {
-    id Int @id @default(autoincrement())
+    id String @id @default(cuid())
 
     email      String  @unique
     password   String
-    name       String?
+    name       String? @default("Не указана")
     avatarPath String  @default("") @map("avatar_path")
-    phone      String? @default("")
-    country    String? @default("")
+    phone      String? @default("Не указан")
+    country    String? @default("Не указана")
+
+    orders    Order[]
+    favorites Product[]
 
     rights Role[] @default([USER])
 
@@ -23,6 +26,8 @@ model User {
 
     createdAt DateTime @default(now()) @map("created_at")
     updatedAt DateTime @updatedAt @map("updated_at")
+
+    @@map("user")
 }
 
 enum Role {
@@ -32,22 +37,31 @@ enum Role {
     ADMIN
 }
 
-model Sneaker {
-    id          Int      @id @default(autoincrement())
+model Product {
+    id String @id @default(cuid())
+
     name        String
     description String?
-    brand       String
-    gender      Gender
     price       Float
-    sizes       Size[]   @relation("SneakerSizes")
-    images      Image[]  @relation("SneakerImages")
-    image       String   @default("")
     discount    Float?   @default(0)
-    rating      Float?   @default(0)
-    color       String
-    stock       Int      @default(0)
-    createdAt   DateTime @default(now()) @map("created_at")
-    updatedAt   DateTime @updatedAt @map("updated_at")
+    images      String[]
+
+    rating Float? @default(0)
+    brand  String
+    stock  Int    @default(0)
+    gender Gender
+    sizes  Size[] @relation("ProductSizes")
+    color  String
+
+    createdAt DateTime @default(now()) @map("created_at")
+    updatedAt DateTime @updatedAt @map("updated_at")
+
+    user   User?   @relation(fields: [userId], references: [id])
+    userId String? @map("user_id")
+
+    orderItems OrderItem[]
+
+    @@map("product")
 }
 
 enum Gender {
@@ -58,13 +72,44 @@ enum Gender {
 
 model Size {
     id       Int       @id @default(autoincrement())
-    size     Float
-    sneakers Sneaker[] @relation("SneakerSizes")
+    size     Int
+    products Product[] @relation("ProductSizes")
 }
 
-model Image {
-    id        Int     @id @default(autoincrement())
-    url       String
-    sneaker   Sneaker @relation("SneakerImages", fields: [sneakerId], references: [id])
-    sneakerId Int
+model Order {
+    id        String   @id @default(cuid())
+    createdAt DateTime @default(now()) @map("created_at")
+    updatedAt DateTime @updatedAt @map("updated_at")
+
+    status EnumOrderStatus @default(PENDING)
+
+    items OrderItem[]
+    total Float
+
+    user   User?   @relation(fields: [userId], references: [id])
+    userId String? @map("user_id")
+
+    @@map("order")
+}
+
+model OrderItem {
+    id        String   @id @default(cuid())
+    createdAt DateTime @default(now()) @map("created_at")
+    updatedAt DateTime @updatedAt @map("updated_at")
+
+    quantity Int
+    price    Int
+
+    order   Order?  @relation(fields: [orderId], references: [id])
+    orderId String? @map("order_id")
+
+    product   Product? @relation(fields: [productId], references: [id])
+    productId String?  @map("product_id")
+
+    @@map("order_item")
+}
+
+enum EnumOrderStatus {
+    PENDING
+    PAYED
 }
