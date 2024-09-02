@@ -97,7 +97,26 @@ export class UserService {
             },
         });
     }
+    async toggleFavorite(productId: string, userId: string) {
+        const user = await this.findById(userId);
 
+        const isExists = user.favorites.some((product) => product.id === productId);
+
+        await this.prisma.user.update({
+            where: {
+                id: user.id,
+            },
+            data: {
+                favorites: {
+                    [isExists ? 'disconnect' : 'connect']: {
+                        id: productId,
+                    },
+                },
+            },
+        });
+
+        return true;
+    }
     private getSearchTermFilter(searchTerm: string): Prisma.UserWhereInput {
         return {
             OR: [

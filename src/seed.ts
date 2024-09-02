@@ -55,7 +55,7 @@ async function main() {
                 stock: +faker.helpers.arrayElement([1, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50]),
                 images: [faker.image.urlPicsumPhotos()],
                 gender: 'MALE',
-                name: faker.commerce.productName(),
+                title: faker.commerce.productName(),
                 price: +faker.commerce.price({ min: 800, max: 10000 }),
                 brand: faker.commerce.productAdjective(),
                 createdAt,

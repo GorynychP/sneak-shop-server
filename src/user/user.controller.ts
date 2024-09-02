@@ -32,6 +32,12 @@ export class UserController {
         return this.userService.update(id, updateUserDto);
     }
 
+    @Auth()
+    @Patch('profile/favorites/:productId')
+    async toggleFavorite(@CurrentUser('id') userId: string, @Param('productId') productId: string) {
+        return this.userService.toggleFavorite(productId, userId);
+    }
+
     @Auth(Role.ADMIN)
     @Delete(':id')
     async remove(@Param('id') id: string) {
