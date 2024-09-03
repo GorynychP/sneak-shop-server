@@ -26,7 +26,7 @@ export class ReviewService {
         return review;
     }
 
-    async create(userId: string, productId: string, storeId: string, dto: ReviewDto) {
+    async create(userId: string, productId: string, dto: ReviewDto) {
         // await this.productService.getById(productId);
 
         return this.prisma.review.create({

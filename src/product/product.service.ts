@@ -48,7 +48,14 @@ export class ProductService {
             include: {
                 review: {
                     include: {
-                        user: true,
+                        user: {
+                            select: {
+                                email: true,
+                                name: true,
+                                avatarPath: true,
+                                rights: true,
+                            },
+                        },
                     },
                 },
             },
