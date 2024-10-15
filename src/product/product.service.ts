@@ -1,21 +1,69 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma.service';
 import { ProductDto } from './dto/product.dto';
+import { PaginationArgsWithSearchTerm } from './base/pagination/pagination.args';
+import { isHasMorePagination } from './base/pagination/is-has-more';
 
 @Injectable()
 export class ProductService {
     constructor(private prisma: PrismaService) {}
 
-    async getAll(searchTerm?: string) {
-        if (typeof searchTerm === 'string') return this.getSearchTermFilter(searchTerm);
+    async getAll(args?: PaginationArgsWithSearchTerm) {
+        const searchTermQuery = args?.searchTerm ? this.getSearchTermFilter(args?.searchTerm) : {};
 
+        const priceFilter =
+            args?.priceFrom !== undefined && args?.priceTo !== undefined
+                ? { price: { gte: +args?.priceFrom, lte: +args?.priceTo } }
+                : {};
+
+        const gender = args?.gender ? { gender: args?.gender } : {};
+
+        const orderBy = args?.sortBy
+            ? {
+                  [args?.sortBy]: args?.sortOrder,
+              }
+            : {};
+
+        const filter = { ...searchTermQuery, ...gender, ...priceFilter };
+
+        const products = await this.prisma.product.findMany({
+            skip: +args?.skip || 0,
+            take: +args?.take || 9,
+            where: filter,
+            orderBy,
+        });
+        const totalCount = await this.prisma.product.count({
+            where: filter,
+        });
+
+        const isHasMore = isHasMorePagination(totalCount, +args?.skip, +args.take);
+
+        return { items: products, isHasMore, totalCount };
+    }
+
+    private async getProductFilter(searchTerm: string) {
+        // if (!searchTerm || typeof searchTerm !== 'string') {
+        //     return {};
+        // }
         return this.prisma.product.findMany({
-            orderBy: {
-                createdAt: 'desc',
+            where: {
+                OR: [
+                    {
+                        title: {
+                            contains: searchTerm,
+                            mode: 'insensitive',
+                        },
+                    },
+                    {
+                        description: {
+                            contains: searchTerm,
+                            mode: 'insensitive',
+                        },
+                    },
+                ],
             },
         });
     }
-
     private async getSearchTermFilter(searchTerm: string) {
         // if (!searchTerm || typeof searchTerm !== 'string') {
         //     return {};

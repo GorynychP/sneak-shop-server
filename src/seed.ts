@@ -1,6 +1,6 @@
 import { PrismaClient } from '@prisma/client';
 import { faker } from '@faker-js/faker';
-import { hash } from 'argon2';
+// import { hash } from 'argon2';
 import 'dotenv/config';
 const prisma = new PrismaClient();
 // enum Gender {
@@ -14,35 +14,35 @@ const prisma = new PrismaClient();
 //     unisex: Gender.UNISEX,
 // };
 // const gender = ['MALE', 'FEMALE', 'UNISEX'];
-const countries = ['Russia', 'Ukraine', 'China', 'Belarus', 'Kazakhstan', 'Turkey '];
+// const countries = ['Russia', 'Ukraine', 'China', 'Belarus', 'Kazakhstan', 'Turkey '];
 
 async function main() {
     const NUM_USERS = 20;
 
-    for (let i = 0; i < NUM_USERS; i++) {
-        const email = faker.internet.email();
-        const password = await hash('123456');
-        const name = faker.person.firstName();
-        const avatarPath = faker.image.avatar();
-        const country = faker.helpers.arrayElement(countries);
-        const createdAt = faker.date.past({ years: 1 });
+    // for (let i = 0; i < NUM_USERS; i++) {
+    //     const email = faker.internet.email();
+    //     const password = await hash('123456');
+    //     const name = faker.person.firstName();
+    //     const avatarPath = faker.image.avatar();
+    //     const country = faker.helpers.arrayElement(countries);
+    //     const createdAt = faker.date.past({ years: 1 });
 
-        const updatedAt = new Date(
-            createdAt.getTime() + Math.random() * (new Date().getTime() - createdAt.getTime()),
-        );
+    //     const updatedAt = new Date(
+    //         createdAt.getTime() + Math.random() * (new Date().getTime() - createdAt.getTime()),
+    //     );
 
-        await prisma.user.create({
-            data: {
-                email,
-                password,
-                country,
-                name,
-                avatarPath,
-                updatedAt,
-                createdAt,
-            },
-        });
-    }
+    //     await prisma.user.create({
+    //         data: {
+    //             email,
+    //             password,
+    //             country,
+    //             name,
+    //             avatarPath,
+    //             updatedAt,
+    //             createdAt,
+    //         },
+    //     });
+    // }
     for (let i = 0; i < NUM_USERS; i++) {
         const createdAt = faker.date.past({ years: 1 });
 
@@ -54,7 +54,7 @@ async function main() {
                 color: faker.color.human(),
                 stock: +faker.helpers.arrayElement([1, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50]),
                 images: [faker.image.urlPicsumPhotos()],
-                gender: 'MALE',
+                gender: faker.helpers.arrayElement(['MALE', 'FEMALE', 'UNISEX']),
                 title: faker.commerce.productName(),
                 price: +faker.commerce.price({ min: 800, max: 10000 }),
                 brand: faker.commerce.productAdjective(),

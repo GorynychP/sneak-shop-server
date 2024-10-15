@@ -16,14 +16,15 @@ import { Auth } from 'src/auth/decorators/auth.decorator';
 import { ProductDto } from './dto/product.dto';
 import { ProductService } from './product.service';
 import { Role } from '@prisma/client';
+import { PaginationArgsWithSearchTerm } from './base/pagination/pagination.args';
 
 @Controller('products')
 export class ProductController {
     constructor(private readonly productService: ProductService) {}
 
     @Get()
-    async getAll(@Query('searchTerm') searchTerm?: string) {
-        return this.productService.getAll(searchTerm);
+    async getAll(@Query() params?: PaginationArgsWithSearchTerm) {
+        return this.productService.getAll(params);
     }
 
     @Get(':id')
