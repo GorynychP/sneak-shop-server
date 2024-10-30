@@ -17,7 +17,7 @@ const prisma = new PrismaClient();
 // const countries = ['Russia', 'Ukraine', 'China', 'Belarus', 'Kazakhstan', 'Turkey '];
 
 async function main() {
-    const NUM_USERS = 20;
+    const NUM = 5;
 
     // for (let i = 0; i < NUM_USERS; i++) {
     //     const email = faker.internet.email();
@@ -43,7 +43,13 @@ async function main() {
     //         },
     //     });
     // }
-    for (let i = 0; i < NUM_USERS; i++) {
+    // const sizes = [36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47]; // Пример размеров
+    // const createdSizes = await prisma.size.createMany({
+    //     data: sizes.map((size) => ({ size })),
+    //     skipDuplicates: true, // Пропускаем дубликаты (если есть)
+    // });
+
+    for (let i = 0; i < NUM; i++) {
         const createdAt = faker.date.past({ years: 1 });
 
         await prisma.product.create({
@@ -53,6 +59,9 @@ async function main() {
                 discount: +faker.helpers.arrayElement([5, 10, 15, 20, 25, 50]),
                 color: faker.color.human(),
                 stock: +faker.helpers.arrayElement([1, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50]),
+                // sizes: {
+                //     create: [{ size: 20 }, { size: 28 }, { size: 49 }, { size: 43 }],
+                // },
                 images: [faker.image.urlPicsumPhotos()],
                 gender: faker.helpers.arrayElement(['MALE', 'FEMALE', 'UNISEX']),
                 title: faker.commerce.productName(),
@@ -62,6 +71,28 @@ async function main() {
             },
         });
     }
+
+    // const products = await Promise.all(
+    //     Array.from({ length: NUM }).map(async () => {
+    //         // Создаем продукт
+    //         const product = await prisma.product.create({
+    //             data: {
+    //                 title: faker.commerce.productName(),
+    //                 description: faker.commerce.productDescription(),
+    //                 price: +faker.commerce.price({ min: 100, max: 1000 }),
+    //                 discount: +faker.helpers.arrayElement([5, 10, 15, 20, 25, 50]),
+    //                 images: [faker.image.urlPicsumPhotos()],
+    //                 rating: +faker.helpers.arrayElement([0, 1, 2, 3, 4, 5]),
+    //                 brand: faker.company.name(),
+    //                 stock: +faker.helpers.arrayElement([1, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50]),
+    //                 gender: faker.helpers.arrayElement(['MALE', 'FEMALE', 'UNISEX']),
+    //                 color: faker.color.human(),
+    //             },
+    //         });
+
+    //     }),
+    // );
+    // return products;
 }
 
 main()

@@ -6,6 +6,7 @@ import { OrderModule } from './order/order.module';
 import { FileModule } from './file/file.module';
 import { ProductModule } from './product/product.module';
 import { ReviewModule } from './review/review.module';
+import { WishlistModule } from './wishlist/wishlist.module';
 
 @Module({
     imports: [
@@ -18,6 +19,7 @@ import { ReviewModule } from './review/review.module';
         FileModule,
         ProductModule,
         ReviewModule,
+        WishlistModule,
     ],
     controllers: [],
     providers: [],

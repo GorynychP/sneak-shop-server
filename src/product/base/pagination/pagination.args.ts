@@ -1,6 +1,6 @@
 import { Gender } from '@prisma/client';
-import { IsEnum, IsIn, IsNumber, IsOptional, IsString, Max, Min } from 'class-validator';
-
+import { IsBoolean, IsEnum, IsIn, IsNumber, IsOptional, IsString, Max, Min } from 'class-validator';
+import { Type } from 'class-transformer';
 export class PaginationArgsDto {
     @IsOptional()
     @IsString()
@@ -9,16 +9,23 @@ export class PaginationArgsDto {
     @IsOptional()
     @IsNumber()
     @Min(0)
+    @Type(() => Number)
     priceFrom?: number;
 
     @IsOptional()
     @IsNumber()
     @Min(0)
+    @Type(() => Number)
     priceTo?: number;
 
     @IsOptional()
     @IsString()
     size?: string;
+
+    @IsOptional()
+    @IsBoolean()
+    @Type(() => Boolean)
+    isSale?: boolean;
 
     @IsOptional()
     @IsEnum(Gender)
@@ -35,12 +42,18 @@ export class PaginationArgsDto {
     @IsOptional()
     @IsNumber()
     @Min(0)
+    @Type(() => Number)
     skip?: number;
+
+    @IsOptional()
+    @IsString()
+    sizes?: string;
 
     @IsOptional()
     @IsNumber()
     @Min(1)
     @Max(100)
+    @Type(() => Number)
     take?: number;
 }
 

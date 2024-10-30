@@ -16,30 +16,31 @@ import { Auth } from 'src/auth/decorators/auth.decorator';
 import { ProductDto } from './dto/product.dto';
 import { ProductService } from './product.service';
 import { Role } from '@prisma/client';
-import { PaginationArgsWithSearchTerm } from './base/pagination/pagination.args';
+import { PaginationArgsDto } from './base/pagination/pagination.args';
+import { PopularArgsDto } from './base/pagination/popular.args';
 
 @Controller('products')
 export class ProductController {
     constructor(private readonly productService: ProductService) {}
 
     @Get()
-    async getAll(@Query() params?: PaginationArgsWithSearchTerm) {
+    async getAll(@Query() params?: PaginationArgsDto) {
         return this.productService.getAll(params);
     }
 
-    @Get(':id')
-    async getById(@Param('id') id: string) {
-        return this.productService.getById(id);
-    }
-
     @Get('most-popular')
-    async getMostPopular() {
-        return this.productService.getMostPopular();
+    async getMostPopular(@Query() params?: PopularArgsDto) {
+        return this.productService.getMostPopular(params);
     }
 
     @Get('similar/:id')
     async getSimilar(@Param('id') id: string) {
         return this.productService.getSimilar(id);
+    }
+
+    @Get(':id')
+    async getById(@Param('id') id: string) {
+        return this.productService.getById(id);
     }
 
     @UsePipes(new ValidationPipe())
