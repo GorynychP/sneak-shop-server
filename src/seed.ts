@@ -1,67 +1,39 @@
 import { PrismaClient } from '@prisma/client';
 import { faker } from '@faker-js/faker';
-// import { hash } from 'argon2';
 import 'dotenv/config';
+import { hash } from 'argon2';
 const prisma = new PrismaClient();
-// enum Gender {
-//     MALE,
-//     FEMALE,
-//     UNISEX,
-// }
-// const genderEnum = {
-//     male: Gender.MALE,
-//     female: Gender.FEMALE,
-//     unisex: Gender.UNISEX,
-// };
-// const gender = ['MALE', 'FEMALE', 'UNISEX'];
-// const countries = ['Russia', 'Ukraine', 'China', 'Belarus', 'Kazakhstan', 'Turkey '];
 
 async function main() {
-    const NUM = 5;
+    const NUM = 10;
+    const NUM_USERS = 2;
 
-    // for (let i = 0; i < NUM_USERS; i++) {
-    //     const email = faker.internet.email();
-    //     const password = await hash('123456');
-    //     const name = faker.person.firstName();
-    //     const avatarPath = faker.image.avatar();
-    //     const country = faker.helpers.arrayElement(countries);
-    //     const createdAt = faker.date.past({ years: 1 });
+    const userIds: string[] = [];
 
-    //     const updatedAt = new Date(
-    //         createdAt.getTime() + Math.random() * (new Date().getTime() - createdAt.getTime()),
-    //     );
+    for (let i = 0; i < NUM_USERS; i++) {
+        const user = await prisma.user.create({
+            data: {
+                email: faker.internet.email(),
+                name: faker.person.fullName(),
+                password: await hash('123456'),
+            },
+        });
+        userIds.push(user.id);
+    }
 
-    //     await prisma.user.create({
-    //         data: {
-    //             email,
-    //             password,
-    //             country,
-    //             name,
-    //             avatarPath,
-    //             updatedAt,
-    //             createdAt,
-    //         },
-    //     });
-    // }
-    // const sizes = [36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47]; // Пример размеров
-    // const createdSizes = await prisma.size.createMany({
-    //     data: sizes.map((size) => ({ size })),
-    //     skipDuplicates: true, // Пропускаем дубликаты (если есть)
-    // });
+    const productIds: string[] = [];
 
     for (let i = 0; i < NUM; i++) {
         const createdAt = faker.date.past({ years: 1 });
 
-        await prisma.product.create({
+        const product = await prisma.product.create({
             data: {
                 description: faker.commerce.productDescription(),
                 rating: +faker.helpers.arrayElement([0, 1, 2, 3, 4, 5]),
                 discount: +faker.helpers.arrayElement([5, 10, 15, 20, 25, 50]),
                 color: faker.color.human(),
+                sizes: [36, 37, 38, 39, 40, 41],
                 stock: +faker.helpers.arrayElement([1, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50]),
-                // sizes: {
-                //     create: [{ size: 20 }, { size: 28 }, { size: 49 }, { size: 43 }],
-                // },
                 images: [faker.image.urlPicsumPhotos()],
                 gender: faker.helpers.arrayElement(['MALE', 'FEMALE', 'UNISEX']),
                 title: faker.commerce.productName(),
@@ -70,29 +42,27 @@ async function main() {
                 createdAt,
             },
         });
+
+        productIds.push(product.id);
     }
 
-    // const products = await Promise.all(
-    //     Array.from({ length: NUM }).map(async () => {
-    //         // Создаем продукт
-    //         const product = await prisma.product.create({
-    //             data: {
-    //                 title: faker.commerce.productName(),
-    //                 description: faker.commerce.productDescription(),
-    //                 price: +faker.commerce.price({ min: 100, max: 1000 }),
-    //                 discount: +faker.helpers.arrayElement([5, 10, 15, 20, 25, 50]),
-    //                 images: [faker.image.urlPicsumPhotos()],
-    //                 rating: +faker.helpers.arrayElement([0, 1, 2, 3, 4, 5]),
-    //                 brand: faker.company.name(),
-    //                 stock: +faker.helpers.arrayElement([1, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50]),
-    //                 gender: faker.helpers.arrayElement(['MALE', 'FEMALE', 'UNISEX']),
-    //                 color: faker.color.human(),
-    //             },
-    //         });
+    for (const productId of productIds) {
+        const numReviews = faker.helpers.arrayElement([1, 2, 3, 4]);
 
-    //     }),
-    // );
-    // return products;
+        for (let i = 0; i < numReviews; i++) {
+            const reviewCreatedAt = faker.date.past({ years: 1 });
+            const randomUserId = faker.helpers.arrayElement(userIds);
+            await prisma.review.create({
+                data: {
+                    text: faker.commerce.productDescription(),
+                    rating: faker.helpers.arrayElement([4, 5]),
+                    createdAt: reviewCreatedAt,
+                    productId, // Привязка к продукту
+                    userId: randomUserId,
+                },
+            });
+        }
+    }
 }
 
 main()

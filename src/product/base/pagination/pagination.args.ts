@@ -19,10 +19,6 @@ export class PaginationArgsDto {
     priceTo?: number;
 
     @IsOptional()
-    @IsString()
-    size?: string;
-
-    @IsOptional()
     @IsBoolean()
     @Type(() => Boolean)
     isSale?: boolean;
@@ -46,7 +42,8 @@ export class PaginationArgsDto {
     skip?: number;
 
     @IsOptional()
-    @IsString()
+    @IsString({ message: 'Поле "sizes" должно быть строкой' })
+    @Type(() => String)
     sizes?: string;
 
     @IsOptional()

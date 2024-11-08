@@ -41,6 +41,7 @@ export class ProductService {
         const gender: Prisma.ProductWhereInput = args?.gender ? { gender: args?.gender } : {};
 
         const isSale: Prisma.ProductWhereInput = args?.isSale ? { discount: { gt: 0 } } : {};
+
         function transformStringToArray(sizes: string) {
             if (!sizes || typeof sizes !== 'string') {
                 return [];
@@ -96,6 +97,9 @@ export class ProductService {
             },
             include: {
                 review: {
+                    orderBy: {
+                        createdAt: 'desc',
+                    },
                     include: {
                         user: {
                             select: {
@@ -110,6 +114,23 @@ export class ProductService {
             },
         });
         if (!product) throw new NotFoundException('Товар не найден');
+
+        // const averageRating = await this.prisma.review.aggregate({
+        //     where: {
+        //         productId: id,
+        //     },
+        //     _avg: {
+        //         rating: true,
+        //     },
+        // });
+        // await this.prisma.product.update({
+        //     where: {
+        //         id,
+        //     },
+        //     data: {
+        //         rating: averageRating._avg.rating || 0,
+        //     },
+        // });
 
         return product;
     }
