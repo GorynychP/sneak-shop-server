@@ -16,7 +16,7 @@ export class AuthService {
         // private emailService: EmailService
     ) {}
 
-    private readonly TOKEN_EXPIRATION_ACCESS = '1h';
+    private readonly TOKEN_EXPIRATION_ACCESS = '15m';
     private readonly TOKEN_EXPIRATION_REFRESH = '7d';
 
     async login(dto: AuthDto) {
@@ -40,10 +40,7 @@ export class AuthService {
     }
 
     async getNewTokens(refreshToken: string) {
-        const result = await this.jwt.verifyAsync(refreshToken);
-        if (!result) {
-            throw new UnauthorizedException('Invalid refresh token');
-        }
+        const result = await this.verifyRefreshToken(refreshToken);
         const user = await this.userService.findById(result.id);
         return this.buildResponseObject(user);
     }
@@ -66,15 +63,18 @@ export class AuthService {
 
     private async validateUser(dto: AuthDto) {
         const user = await this.userService.findByEmail(dto.email);
+
         if (!user) {
             throw new UnauthorizedException('Email or password invalid');
         }
         const isValid = await verify(user.password, dto.password);
+
         if (!isValid) {
             throw new UnauthorizedException('Email or password invalid');
         }
         return user;
     }
+
     async buildResponseObject(user: User) {
         const tokens = await this.issueTokens(user.id, user.rights);
         return { user: this.omitPassword(user), ...tokens };
@@ -83,14 +83,25 @@ export class AuthService {
     private async issueTokens(userId: string, rights: Role[]) {
         const payload = { id: userId, rights };
         const accessToken = this.jwt.sign(payload, {
-            expiresIn: this.TOKEN_EXPIRATION_ACCESS,
+            expiresIn: this.TOKEN_EXPIRATION_ACCESS || '15m',
         });
         const refreshToken = this.jwt.sign(payload, {
-            expiresIn: this.TOKEN_EXPIRATION_REFRESH,
+            expiresIn: this.TOKEN_EXPIRATION_REFRESH || '7d',
         });
         return { accessToken, refreshToken };
     }
 
+    async verifyRefreshToken(token: string) {
+        try {
+            const result = await this.jwt.verifyAsync(token);
+            return result;
+        } catch (error) {
+            if (error.name === 'TokenExpiredError') {
+                throw new UnauthorizedException('Refresh token expired');
+            }
+            throw new UnauthorizedException('Invalid refresh token');
+        }
+    }
     private omitPassword(user: User) {
         return omit(user, ['password']);
     }

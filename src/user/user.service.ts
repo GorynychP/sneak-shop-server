@@ -8,6 +8,7 @@ import { PaginationArgsWithSearchTerm } from 'src/base/pagination/pagination';
 import { Prisma } from '@prisma/client';
 import { hash } from 'argon2';
 import { faker } from '@faker-js/faker';
+// import { omit } from 'lodash';
 
 @Injectable()
 export class UserService {
@@ -46,12 +47,14 @@ export class UserService {
     async findById(id: string) {
         const user = await this.prisma.user.findUnique({
             where: { id },
+
             include: {
                 favorites: true,
                 orders: true,
             },
         });
         if (!user) throw new NotFoundException('User not found');
+        // const userOmit = omit(user, ['password', 'createdAt', 'updatedAt']);
         return user;
     }
     async findByEmail(email: string) {
@@ -66,17 +69,20 @@ export class UserService {
         return user;
     }
 
-    async update(id: string, { password, rights, ...data }: UpdateUserDto) {
+    async update(id: string, { password, ...data }: UpdateUserDto) {
         const currentUser = await this.findById(id);
-        if (rights && !currentUser.rights.includes('ADMIN')) {
-            throw new ForbiddenException('You do not have permission to change rights.');
+
+        if (!currentUser.rights.includes('USER') && !currentUser.rights.includes('ADMIN')) {
+            throw new ForbiddenException('У вас недостаточно прав для редактирование');
         }
+
         const hashedPassword = password
             ? {
                   password: await hash(password),
               }
             : {};
-        const updateData = currentUser.rights.includes('ADMIN') ? { ...data, rights } : data;
+        const updateData = currentUser.rights.includes('ADMIN') ? { ...data } : data;
+
         return this.prisma.user.update({
             where: {
                 id,

@@ -5,8 +5,8 @@ import { hash } from 'argon2';
 const prisma = new PrismaClient();
 
 async function main() {
-    const NUM = 10;
-    const NUM_USERS = 2;
+    const NUM = 80;
+    const NUM_USERS = 10;
 
     const userIds: string[] = [];
 
@@ -29,7 +29,7 @@ async function main() {
         const product = await prisma.product.create({
             data: {
                 description: faker.commerce.productDescription(),
-                rating: +faker.helpers.arrayElement([0, 1, 2, 3, 4, 5]),
+                // rating: +faker.helpers.arrayElement([0, 1, 2, 3, 4, 5]),
                 discount: +faker.helpers.arrayElement([5, 10, 15, 20, 25, 50]),
                 color: faker.color.human(),
                 sizes: [36, 37, 38, 39, 40, 41],
@@ -37,7 +37,7 @@ async function main() {
                 images: [faker.image.urlPicsumPhotos()],
                 gender: faker.helpers.arrayElement(['MALE', 'FEMALE', 'UNISEX']),
                 title: faker.commerce.productName(),
-                price: +faker.commerce.price({ min: 800, max: 10000 }),
+                price: +faker.commerce.price({ min: 2000, max: 20000 }),
                 brand: faker.commerce.productAdjective(),
                 createdAt,
             },
@@ -55,7 +55,7 @@ async function main() {
             await prisma.review.create({
                 data: {
                     text: faker.commerce.productDescription(),
-                    rating: faker.helpers.arrayElement([4, 5]),
+                    rating: faker.helpers.arrayElement([3, 4, 5]),
                     createdAt: reviewCreatedAt,
                     productId, // Привязка к продукту
                     userId: randomUserId,

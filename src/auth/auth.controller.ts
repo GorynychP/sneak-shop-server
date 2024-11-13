@@ -47,7 +47,6 @@ export class AuthController {
     @Post('access-token')
     async getNewTokens(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
         const refreshTokenFromCookies = req.cookies[this.refreshTokenService.REFRESH_TOKEN_NAME];
-
         if (!refreshTokenFromCookies) {
             this.refreshTokenService.removeRefreshTokenFromResponse(res);
             throw new UnauthorizedException('Refresh token not passed');
@@ -55,9 +54,14 @@ export class AuthController {
 
         const { refreshToken, ...response } = await this.authService.getNewTokens(refreshTokenFromCookies);
 
+        if (!refreshToken) {
+            this.refreshTokenService.removeRefreshTokenFromResponse(res);
+            throw new UnauthorizedException('Refresh token expired');
+        }
+
         this.refreshTokenService.addRefreshTokenToResponse(res, refreshToken);
 
-        return response;
+        return { accessToken: response.accessToken };
     }
 
     @HttpCode(200)

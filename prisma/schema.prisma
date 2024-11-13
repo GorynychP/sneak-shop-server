@@ -16,6 +16,8 @@ model User {
     avatarPath String  @default("") @map("avatar_path")
     phone      String? @default("Не указан")
     country    String? @default("Не указана")
+    city       String? @default("Не указан")
+    address    String? @default("Не указан")
 
     orders    Order[]
     favorites Product[]
