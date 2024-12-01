@@ -29,6 +29,15 @@ export class ProductService {
 
         return { items: products, isHasMore, totalCount };
     }
+    async getAllProducts(args?: PaginationArgsDto) {
+        const searchTermQuery = await this.getSearchTermFilter(args?.searchTerm);
+
+        const products = await this.prisma.product.findMany({
+            where: searchTermQuery,
+        });
+
+        return products;
+    }
 
     private async getFilters(args?: PaginationArgsDto) {
         const searchTermQuery = await this.getSearchTermFilter(args?.searchTerm);
@@ -190,11 +199,12 @@ export class ProductService {
             data: {
                 title: dto.title,
                 description: dto.description,
+                discount: dto.discount,
                 price: dto.price,
                 images: dto.images,
                 gender: dto.gender,
-                brand: dto.brand,
-                color: dto.color,
+                brand: 'Nike',
+                color: 'red',
             },
         });
     }

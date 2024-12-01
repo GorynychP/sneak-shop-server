@@ -9,6 +9,13 @@ export class RatingService {
 
     @Cron(CronExpression.EVERY_MINUTE)
     async calculateAverageRatings() {
+        // const updatedUser = await this.prisma.user.update({
+        //     where: { id: 'cm3k1pyxf0000nzlc2hix3109' },
+        //     data: {
+        //         rights: { push: 'USER' }, // Используем set для замены существующих значений
+        //     },
+        // });
+        // console.log('updatedUser', updatedUser);
         const products = await this.prisma.product.findMany({
             include: {
                 review: {
@@ -31,4 +38,9 @@ export class RatingService {
 
         // console.log('Средний рейтинг всех продуктов обновлён.');
     }
+
+    // async function updateUserRights() {
+
+    //   console.log('Права пользователей успешно обновлены.');
+    // }
 }

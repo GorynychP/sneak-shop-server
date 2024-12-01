@@ -164,6 +164,7 @@ model OrderItem {
 
     quantity Int
     price    Int
+    size     Int
 
     order   Order?  @relation(fields: [orderId], references: [id])
     orderId String? @map("order_id")

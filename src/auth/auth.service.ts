@@ -30,7 +30,7 @@ export class AuthService {
             throw new BadRequestException('Такой пользователь уже существует');
         }
         const user = await this.userService.create(dto);
-
+        console.log('user', user);
         // await this.emailService.sendVerification(
         //     user.email,
         //     `http://localhost:4200/verify-email?token=${user.verificationToken}`,

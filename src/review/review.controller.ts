@@ -20,6 +20,13 @@ export class ReviewController {
     constructor(private readonly reviewService: ReviewService) {}
 
     @HttpCode(200)
+    @Auth([Role.ADMIN, Role.MANAGER])
+    @Get()
+    async getAll() {
+        return this.reviewService.getAll();
+    }
+
+    @HttpCode(200)
     @Get(':productId')
     async getAllForProduct(@Param('productId') productId: string) {
         return this.reviewService.getAllByProductId(productId);

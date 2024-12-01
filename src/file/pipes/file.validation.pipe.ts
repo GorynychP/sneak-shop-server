@@ -16,9 +16,7 @@ const MAX_ZIP_FILE_SIZE = 100 * 1024 * 1024; // 100 МБ для zip файлов
 @Injectable()
 export class FileValidationPipe implements PipeTransform {
     transform(value: any) {
-        console.log(value);
         const files = Array.isArray(value) ? value : [value];
-        console.log('files', files);
 
         for (const file of files) {
             if (!file || !file.mimetype) {

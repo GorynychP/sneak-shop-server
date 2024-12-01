@@ -45,6 +45,22 @@ export class ReviewService {
 
         return reviews;
     }
+    async getAll() {
+        const reviews = await this.prisma.review.findMany({
+            include: {
+                user: {
+                    select: {
+                        email: true,
+                        name: true,
+                        avatarPath: true,
+                        rights: true,
+                    },
+                },
+            },
+        });
+
+        return reviews;
+    }
 
     async create(userId: string, productId: string, dto: ReviewDto) {
         // await this.productService.getById(productId);

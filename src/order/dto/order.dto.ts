@@ -26,4 +26,7 @@ export class OrderItemDto {
 
     @IsString({ message: 'ID продукта должен быть строкой' })
     productId: string;
+
+    @IsNumber({}, { message: 'Размер должна быть числом' })
+    size: number;
 }

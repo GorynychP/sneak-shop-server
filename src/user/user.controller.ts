@@ -5,6 +5,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { Auth } from 'src/auth/decorators/auth.decorator';
 import { Role } from '@prisma/client';
 import { CurrentUser } from 'src/auth/decorators/user.decorator';
+import { EditUserDto } from './dto/edit-user.dto';
 
 @Controller('users')
 export class UserController {
@@ -50,6 +51,7 @@ export class UserController {
     async getPremium() {
         return { text: 'Premium content' };
     }
+
     @Auth([Role.ADMIN, Role.MANAGER])
     @Get('manager')
     async getManagerContent() {
@@ -60,5 +62,11 @@ export class UserController {
     @Get('list')
     async getList() {
         return this.userService.findAll();
+    }
+
+    @Auth([Role.ADMIN])
+    @Patch('edit/:userId')
+    async changeRoles(@Body() dto: EditUserDto, @Param('userId') userId: string) {
+        return this.userService.editRolesUser(dto.rights, userId);
     }
 }

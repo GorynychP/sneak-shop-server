@@ -14,10 +14,28 @@ const checkout = new YooCheckout({
 export class OrderService {
     constructor(private prisma: PrismaService) {}
 
+    async getAllForUser(userId: string) {
+        return this.prisma.order.findMany({
+            where: {
+                user: {
+                    id: userId,
+                },
+            },
+            include: {
+                items: {
+                    include: {
+                        product: true,
+                    },
+                },
+            },
+        });
+    }
+
     async createPayment(dto: OrderDto, userId: string) {
         const orderItems = dto.items.map((item) => ({
             quantity: item.quantity,
             price: item.price,
+            size: item.size,
             product: {
                 connect: {
                     id: item.productId,
@@ -53,6 +71,7 @@ export class OrderService {
             payment_method_data: {
                 type: 'bank_card',
             },
+
             confirmation: {
                 type: 'redirect',
                 return_url: `${process.env.CLIENT_URL}/thanks`,

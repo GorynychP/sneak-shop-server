@@ -2,10 +2,10 @@ import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/commo
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { PrismaService } from 'src/prisma.service';
-import { isHasMorePagination } from 'src/base/pagination/is-has-more';
-import { UserResponse } from './user.response';
+// import { isHasMorePagination } from 'src/base/pagination/is-has-more';
+// import { UserResponse } from './user.response';
 import { PaginationArgsWithSearchTerm } from 'src/base/pagination/pagination';
-import { Prisma } from '@prisma/client';
+import { Prisma, Role } from '@prisma/client';
 import { hash } from 'argon2';
 import { faker } from '@faker-js/faker';
 // import { omit } from 'lodash';
@@ -24,24 +24,25 @@ export class UserService {
         });
     }
 
-    async findAll(args?: PaginationArgsWithSearchTerm): Promise<UserResponse> {
+    async findAll(args?: PaginationArgsWithSearchTerm) {
         const searchTermQuery = args?.searchTerm ? this.getSearchTermFilter(args?.searchTerm) : {};
 
         const users = await this.prisma.user.findMany({
-            skip: +args?.skip || 0,
-            take: +args?.take || 20,
+            // skip: +args?.skip || 0,
+            // take: +args?.take || 20,
             where: searchTermQuery,
         });
 
         if (!users) throw new NotFoundException('Users not found');
 
-        const totalCount = await this.prisma.user.count({
-            where: searchTermQuery,
-        });
+        // const totalCount = await this.prisma.user.count({
+        //     where: searchTermQuery,
+        // });
 
-        const isHasMore = isHasMorePagination(totalCount, +args?.skip, +args?.take);
+        // const isHasMore = isHasMorePagination(totalCount, +args?.skip, +args?.take);
 
-        return { items: users, isHasMore };
+        // return { items: users, isHasMore };
+        return users;
     }
 
     async findById(id: string) {
@@ -122,6 +123,23 @@ export class UserService {
         });
 
         return true;
+    }
+
+    async editRolesUser(rights: Role[], userId: string) {
+        const user = await this.findById(userId);
+
+        if (!user) throw new NotFoundException('User not found');
+
+        const updatedUser = await this.prisma.user.update({
+            where: {
+                id: user.id,
+            },
+            data: {
+                rights,
+            },
+        });
+
+        return updatedUser;
     }
     private getSearchTermFilter(searchTerm: string): Prisma.UserWhereInput {
         return {

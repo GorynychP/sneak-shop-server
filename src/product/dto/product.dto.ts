@@ -1,5 +1,5 @@
 import { Gender } from '@prisma/client';
-import { ArrayMinSize, IsEnum, IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
+import { ArrayMinSize, IsEnum, IsNotEmpty, IsNumber, IsOptional, IsString, Min, Max } from 'class-validator';
 
 export class ProductDto {
     @IsString({
@@ -16,6 +16,12 @@ export class ProductDto {
     @IsNotEmpty({ message: 'Цена не может быть пустой' })
     price: number;
 
+    @IsNumber({}, { message: 'Скидка должна быть числом' })
+    @Min(0, { message: 'Скидка не может быть отрицательной' })
+    @Max(80, { message: 'Скидка не может быть больше 80' })
+    @IsNotEmpty({ message: 'Скидка не может быть пустой' })
+    discount: number;
+
     @IsString({
         message: 'Укажите хотя бы одну картинку',
         each: true,
@@ -31,11 +37,11 @@ export class ProductDto {
     @IsOptional()
     gender: Gender;
 
-    @IsString({ message: 'Бренд обязателен' })
-    @IsNotEmpty({ message: 'Бренд не может быть пустым' })
-    brand: string;
+    // @IsString({ message: 'Бренд обязателен' })
+    // @IsNotEmpty({ message: 'Бренд не может быть пустым' })
+    // brand: string;
 
-    @IsString({ message: 'Цвет обязателен' })
-    @IsNotEmpty({ message: 'Цвет не может быть пустым' })
-    color: string;
+    // @IsString({ message: 'Цвет обязателен' })
+    // @IsNotEmpty({ message: 'Цвет не может быть пустым' })
+    // color: string;
 }

@@ -28,6 +28,11 @@ export class ProductController {
         return this.productService.getAll(params);
     }
 
+    @Get('all')
+    async getAllProducts(@Query() params?: PaginationArgsDto) {
+        return this.productService.getAllProducts(params);
+    }
+
     @Get('most-popular')
     async getMostPopular(@Query() params?: PopularArgsDto) {
         return this.productService.getMostPopular(params);
@@ -38,7 +43,7 @@ export class ProductController {
         return this.productService.getSimilar(id);
     }
 
-    @Get(':id')
+    @Get('by-id/:id')
     async getById(@Param('id') id: string) {
         return this.productService.getById(id);
     }
