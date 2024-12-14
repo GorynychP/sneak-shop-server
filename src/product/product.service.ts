@@ -6,10 +6,14 @@ import { isHasMorePagination } from './base/pagination/is-has-more';
 import { Prisma } from '@prisma/client';
 
 import { PopularArgsDto } from './base/pagination/popular.args';
+import { FileService } from 'src/file/file.service';
 
 @Injectable()
 export class ProductService {
-    constructor(private prisma: PrismaService) {}
+    constructor(
+        private prisma: PrismaService,
+        private fileService: FileService,
+    ) {}
 
     async getAll(args?: PaginationArgsDto) {
         const { filters, orderBy } = await this.getFilters(args);
@@ -193,36 +197,49 @@ export class ProductService {
 
         return products;
     }
-
+    async createFilesForProduct(productId: string, images: string[]) {
+        await this.fileService.createFiles(productId, images);
+    }
     async create(dto: ProductDto) {
-        return this.prisma.product.create({
+        const product = await this.prisma.product.create({
             data: {
                 title: dto.title,
                 description: dto.description,
                 discount: dto.discount,
                 price: dto.price,
+                sizes: dto.sizes,
                 images: dto.images,
                 gender: dto.gender,
                 brand: 'Nike',
                 color: 'red',
             },
         });
+
+        await this.createFilesForProduct(product.id, product.images);
+
+        return product;
     }
 
     async update(id: string, dto: ProductDto) {
         await this.getById(id);
-
+        await this.fileService.deleteFiles(id);
+        await this.createFilesForProduct(id, dto.images);
         return this.prisma.product.update({
             where: { id },
-            data: dto,
+            data: {
+                images: dto.images,
+                ...dto,
+            },
         });
     }
 
     async delete(id: string) {
-        await this.getById(id);
+        const product = await this.getById(id);
+        await this.fileService.deleteFiles(product.id);
         await this.prisma.product.delete({
             where: { id },
         });
+
         return { massage: `Товар c id:${id} был удален` };
     }
 }

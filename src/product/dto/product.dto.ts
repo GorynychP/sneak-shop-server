@@ -1,5 +1,15 @@
 import { Gender } from '@prisma/client';
-import { ArrayMinSize, IsEnum, IsNotEmpty, IsNumber, IsOptional, IsString, Min, Max } from 'class-validator';
+import {
+    ArrayMinSize,
+    IsEnum,
+    IsNotEmpty,
+    IsNumber,
+    IsOptional,
+    IsString,
+    Min,
+    Max,
+    IsArray,
+} from 'class-validator';
 
 export class ProductDto {
     @IsString({
@@ -32,6 +42,10 @@ export class ProductDto {
         message: 'Путь к картинке не может быть пустым',
     })
     images: string[];
+
+    @IsArray({ message: 'Размеры должны быть массивом' })
+    @ArrayMinSize(1, { message: 'Должен быть хоть один размер' })
+    sizes: number[];
 
     @IsEnum(Gender)
     @IsOptional()

@@ -49,6 +49,7 @@ model Product {
     price       Float
     discount    Float?   @default(0)
     images      String[]
+    image       Image[]
 
     rating Float? @default(0)
     brand  String
@@ -68,6 +69,19 @@ model Product {
     WishlistItem WishlistItem[]
 
     @@map("product")
+}
+
+model Image {
+    id  String @id @default(cuid())
+    url String
+
+    product   Product @relation(fields: [productId], references: [id])
+    productId String  @map("product_id")
+
+    createdAt DateTime @default(now()) @map("created_at")
+    updatedAt DateTime @updatedAt @map("updated_at")
+
+    @@map("image")
 }
 
 model Review {

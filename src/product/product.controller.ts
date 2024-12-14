@@ -53,7 +53,7 @@ export class ProductController {
     @Auth([Role.ADMIN])
     @Post()
     async create(@Body() dto: ProductDto) {
-        return this.productService.create(dto);
+        return await this.productService.create(dto);
     }
 
     @UsePipes(new ValidationPipe())

@@ -12,7 +12,7 @@ export class RatingService {
         // const updatedUser = await this.prisma.user.update({
         //     where: { id: 'cm3k1pyxf0000nzlc2hix3109' },
         //     data: {
-        //         rights: { push: 'USER' }, // Используем set для замены существующих значений
+        //         rights: { set: ['ADMIN','USER'] },
         //     },
         // });
         // console.log('updatedUser', updatedUser);
@@ -38,9 +38,4 @@ export class RatingService {
 
         // console.log('Средний рейтинг всех продуктов обновлён.');
     }
-
-    // async function updateUserRights() {
-
-    //   console.log('Права пользователей успешно обновлены.');
-    // }
 }
