@@ -7,6 +7,7 @@ import { Prisma } from '@prisma/client';
 
 import { PopularArgsDto } from './base/pagination/popular.args';
 import { FileService } from 'src/file/file.service';
+import { areArraysEqual } from './helpers/areArraysEqual';
 
 @Injectable()
 export class ProductService {
@@ -221,16 +222,28 @@ export class ProductService {
     }
 
     async update(id: string, dto: ProductDto) {
-        await this.getById(id);
-        await this.fileService.deleteFiles(id);
-        await this.createFilesForProduct(id, dto.images);
-        return this.prisma.product.update({
-            where: { id },
-            data: {
-                images: dto.images,
-                ...dto,
-            },
-        });
+        const product = await this.getById(id);
+        const isEqualFiles = areArraysEqual(dto.images, product.images);
+
+        if (!isEqualFiles) {
+            await this.fileService.deleteFiles(id);
+            await this.createFilesForProduct(id, dto.images);
+            return this.prisma.product.update({
+                where: { id },
+                data: {
+                    images: dto.images,
+                    ...dto,
+                },
+            });
+        } else {
+            return this.prisma.product.update({
+                where: { id },
+                data: {
+                    images: dto.images,
+                    ...dto,
+                },
+            });
+        }
     }
 
     async delete(id: string) {

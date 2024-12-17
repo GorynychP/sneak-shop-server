@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { path } from 'app-root-path';
 import { ensureDir, writeFile, unlink } from 'fs-extra';
 import { IFile, IMediaResponse } from './file.interface';
@@ -8,6 +8,15 @@ import { PrismaService } from 'src/prisma.service';
 @Injectable()
 export class FileService {
     constructor(private readonly prisma: PrismaService) {}
+
+    async finedFiles(productId: string) {
+        const files = await this.prisma.image.findMany({
+            where: { productId },
+        });
+        if (!files) throw new NotFoundException('Файлы не найдены');
+        return files;
+    }
+
     async createFiles(productId: string, images: string[]) {
         const files = await this.prisma.image.createMany({
             data: images.map((image) => ({
@@ -32,6 +41,7 @@ export class FileService {
             }
             return;
         }
+
         const images = await this.prisma.image.findMany({
             where: { productId },
         });
